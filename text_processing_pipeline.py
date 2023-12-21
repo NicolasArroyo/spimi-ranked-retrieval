@@ -1,4 +1,5 @@
 import os
+import pickle
 import string
 
 import nltk
@@ -37,12 +38,29 @@ def normalize_tokens(tokens):
 
 
 def stem_tokens(tokens):
-    for i, token in enumerate(tokens):
+    for token in tokens:
         yield porter_stemmer.stem(token)
 
 
-def process_files(directory):
+def update_filenames_dict(dict_folder, filename):
+    filenames_dict_path = os.path.join(dict_folder, "filenames_dict.pkl")
+
+    if os.path.exists(filenames_dict_path):
+        with open(filenames_dict_path, "rb") as file:
+            filenames_dict = pickle.load(file)
+    else:
+        filenames_dict = {}
+
+    new_key = f"doc{len(filenames_dict)}"
+    filenames_dict[new_key] = filename
+
+    with open(filenames_dict_path, "wb") as file:
+        pickle.dump(filenames_dict, file)
+
+
+def process_files(directory, filenames_dict_path):
     for filename in os.listdir(directory):
+        update_filenames_dict(filenames_dict_path, filename)
         filepath = os.path.join(directory, filename)
 
         try:
@@ -61,5 +79,13 @@ def process_files(directory):
 
 
 if __name__ == "__main__":
-    for word in process_files("./books/"):
-        print(word)
+    for word in process_files("./books/", "./"):
+        print(word, end=" ")
+
+    with open("./filenames_dict.pkl", "rb") as file:
+        filenames_dict = pickle.load(file)
+
+    print("")
+    print(filenames_dict)
+
+    os.remove("filenames_dict.pkl")
