@@ -57,10 +57,12 @@ def update_filenames_dict(filenames_dict_dir, filename):
     with open(filenames_dict_path, "w", encoding="utf-8") as file:
         json.dump(filenames_dict, file, indent=4)
 
+    return len(filenames_dict) - 1
+
 
 def process_files_txt(files_dir, filenames_dict_dir):
     for filename in os.listdir(files_dir):
-        update_filenames_dict(filenames_dict_dir, filename)
+        file_id = update_filenames_dict(filenames_dict_dir, filename)
         filepath = os.path.join(files_dir, filename)
 
         try:
@@ -72,7 +74,7 @@ def process_files_txt(files_dir, filenames_dict_dir):
 
                     for word in tokens:
                         if word:
-                            yield [word, filename]
+                            yield [word, file_id]
 
         except IOError:
             print(f"File {filepath} could not be read.")
