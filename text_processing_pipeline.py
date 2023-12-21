@@ -1,5 +1,5 @@
 import os
-import pickle
+import json
 import string
 
 import nltk
@@ -42,26 +42,26 @@ def stem_tokens(tokens):
         yield porter_stemmer.stem(token)
 
 
-def update_filenames_dict(dict_folder, filename):
-    filenames_dict_path = os.path.join(dict_folder, "filenames_dict.pkl")
+def update_filenames_dict(filenames_dict_dir, filename):
+    filenames_dict_path = os.path.join(filenames_dict_dir, "filenames_dict.json")
 
     if os.path.exists(filenames_dict_path):
-        with open(filenames_dict_path, "rb") as file:
-            filenames_dict = pickle.load(file)
+        with open(filenames_dict_path, "r", encoding="utf-8") as file:
+            filenames_dict = json.load(file)
     else:
         filenames_dict = {}
 
     new_key = f"doc{len(filenames_dict)}"
     filenames_dict[new_key] = filename
 
-    with open(filenames_dict_path, "wb") as file:
-        pickle.dump(filenames_dict, file)
+    with open(filenames_dict_path, "w", encoding="utf-8") as file:
+        json.dump(filenames_dict, file, indent=4)
 
 
-def process_files(directory, filenames_dict_path):
-    for filename in os.listdir(directory):
-        update_filenames_dict(filenames_dict_path, filename)
-        filepath = os.path.join(directory, filename)
+def process_files_txt(files_dir, filenames_dict_dir):
+    for filename in os.listdir(files_dir):
+        update_filenames_dict(filenames_dict_dir, filename)
+        filepath = os.path.join(files_dir, filename)
 
         try:
             with open(filepath, "r", encoding="utf-8") as file:
@@ -79,13 +79,13 @@ def process_files(directory, filenames_dict_path):
 
 
 if __name__ == "__main__":
-    for word in process_files("./books/", "./"):
+    for word in process_files_txt("./books/", "./"):
         print(word, end=" ")
 
-    with open("./filenames_dict.pkl", "rb") as file:
-        filenames_dict = pickle.load(file)
+    with open("./filenames_dict.json", "r", encoding='utf-8') as file:
+        filenames_dict = json.load(file)
 
     print("")
     print(filenames_dict)
 
-    os.remove("filenames_dict.pkl")
+    os.remove("filenames_dict.json")
