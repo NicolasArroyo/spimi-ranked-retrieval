@@ -19,42 +19,45 @@ def tokenize_line(line):
 
 
 def normalize_tokens(tokens):
-    # Design: Delete tokens that contains punctuation
-    tokens = [token for token in tokens if token not in string.punctuation]
+    for i, token in enumerate(tokens):
+        # Design: Delete tokens that contains punctuation
+        if token in string.punctuation:
+            continue
 
-    # Design: Delete tokens that can be cast to a number
-    tokens = [token for token in tokens if not token.isnumeric()]
+        # Design: Delete tokens that can be cast to a number
+        if token.isnumeric():
+            continue
 
-    # Design: Apply lowercase to the first token in each line
-    if len(tokens) > 0:
-        tokens[0] = tokens[0].lower()
+        # Design: Delete tokens without alphanumeric characters
+        if not any(char.isalnum() for char in token):
+            continue
 
-    # Design: Delete tokens without alphanumeric characters
-    tokens = [token for token in tokens if any(char.isalnum() for char in token)]
-
-    return tokens
+        # Design: Apply lowercase to the first token in each line
+        yield token.lower() if i == 0 else token
 
 
 def stem_tokens(tokens):
-    stemmer = nltk.PorterStemmer()
-    tokens = [stemmer.stem(token) for token in tokens]
-
-    return tokens
+    for i, token in enumerate(tokens):
+        yield porter_stemmer.stem(token)
 
 
-def process_files(directory: str):
+def process_files(directory):
     for filename in os.listdir(directory):
-        with open(directory + filename, "r", encoding="utf-8") as file:
-            for line in file:
-                line = tokenize_line(line)
-                line = normalize_tokens(line)
-                line = stem_tokens(line)
+        filepath = os.path.join(directory, filename)
 
-                if len(line) == 0:
-                    continue
+        try:
+            with open(filepath, "r", encoding="utf-8") as file:
+                for line in file:
+                    tokens = tokenize_line(line)
+                    tokens = normalize_tokens(tokens)
+                    tokens = stem_tokens(tokens)
 
-                for word in line:
-                    yield word
+                    for word in tokens:
+                        if word:
+                            yield [word, filename]
+
+        except IOError:
+            print(f"File {filepath} could not be read.")
 
 
 if __name__ == "__main__":
