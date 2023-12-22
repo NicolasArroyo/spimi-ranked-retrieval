@@ -32,13 +32,18 @@ def get_total_size(obj, seen=None):
 
 
 def save_block(block_name, block_dict):
-    pass
+    # print(block_dict)
+    with open(f"./blocks/{block_name}.txt", "w") as file:
+        for key in block_dict:
+            file.write(f"{key},")
+            for elem in block_dict[key]:
+                file.write(f"{elem[0]},{elem[1]}\n")
 
 
 def sort_and_save_block(dictionary, block_counter):
     sorted_dictionary = dict(sorted(dictionary.items()))
     save_block(f"block{block_counter}", sorted_dictionary)
-    print(block_counter, get_total_size(sorted_dictionary), sorted_dictionary)
+    # print(block_counter, get_total_size(sorted_dictionary), sorted_dictionary)
 
     return sorted_dictionary
 
@@ -74,7 +79,15 @@ def spimi_invert(token_stream):
 
 
 if __name__ == "__main__":
-    spimi_invert(process_files_txt("./books", "./"))
+    for filename in os.listdir('./blocks'):
+        if os.path.isfile(os.path.join('./blocks', filename)):
+            os.remove(os.path.join('./blocks', filename))
+
+    try:
+        spimi_invert(process_files_txt("./books", "./"))
+
+    except:
+        print("Error while executing")
 
     with open("./filenames_dict.json", "r", encoding='utf-8') as file:
         filenames_dict = json.load(file)
