@@ -26,7 +26,11 @@ def normalize_tokens(tokens):
             continue
 
         # Design: Delete tokens that can be cast to a number
-        if token.isnumeric():
+        # if token.isnumeric():
+        #     continue
+
+        # Design: Delete tokens that contain numbers
+        if any(char.isnumeric() for char in token):
             continue
 
         # Design: Delete tokens without alphanumeric characters
