@@ -4,9 +4,10 @@ import json
 import heapq
 import math
 import nltk
+import logging
 from text_processing_pipeline import process_files_txt
 
-PAGE_SIZE = 40960
+PAGE_SIZE = 4096
 
 
 def parse_line(line):
@@ -195,7 +196,7 @@ def calculate_tfidf(merged_index_path, filenames_path, output_path):
             output_file.write(','.join(new_line) + '\n')
 
 
-def compute_vector_score(query, merged_index_tfidf_path):
+def compute_vector_score(query, merged_index_tfidf_path, k):
     porter_stemmer = nltk.PorterStemmer()
 
     index = {}
@@ -221,35 +222,30 @@ def compute_vector_score(query, merged_index_tfidf_path):
             doc_scores[doc_id] += weight * doc_weight
 
     sorted_docs = sorted(doc_scores.items(), key=lambda x: x[1], reverse=True)
+    sorted_docs = sorted_docs[0:k]
     return sorted_docs
 
 
-if __name__ == "__main__":
-    for filename in os.listdir('./blocks'):
-        if os.path.isfile(os.path.join('./blocks', filename)):
-            os.remove(os.path.join('./blocks', filename))
+def initialize_index():
+    for file in ['merged_index.txt', 'filenames_dict.json']:
+        file_path = os.path.join('./', file)
+        if os.path.isfile(file_path):
+            os.remove(file_path)
 
-    for filename in os.listdir('./'):
-        if os.path.isfile(os.path.join('./', "merged_index.txt")):
-            os.remove(os.path.join('./', "merged_index.txt"))
+    blocks_dir = './blocks'
+    for filename in os.listdir(blocks_dir):
+        file_path = os.path.join(blocks_dir, filename)
+        if os.path.isfile(file_path):
+            os.remove(file_path)
 
     try:
         spimi_invert(process_files_txt("./books", "./"))
         merge_blocks('./blocks', 'merged_index.txt')
+        calculate_tfidf("./merged_index.txt", "./filenames_dict.json", "./merged_index_tfidf.txt")
 
-    except:
-        print("Error while executing")
+    except Exception as e:
+        logging.error(f"Error while executing: {e}")
 
-    with open("./filenames_dict.json", "r", encoding='utf-8') as file:
-        filenames_dict = json.load(file)
 
-    print(json.dumps(filenames_dict))
-
-    calculate_tfidf("./merged_index.txt", "./filenames_dict.json", "./merged_index_tfidf.txt")
-
-    query = str(input("Enter your query: "))
-    results = compute_vector_score(query, "./merged_index_tfidf.txt")
-    for doc_id, score in results:
-        print(filenames_dict[f"doc{doc_id}"], score)
-
-    os.remove("filenames_dict.json")
+if __name__ == "__main__":
+    initialize_index()
