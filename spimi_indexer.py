@@ -3,7 +3,7 @@ import os
 import json
 from text_processing_pipeline import process_files_txt
 
-BLOCK_SIZE = 40000
+PAGE_SIZE = 4096
 
 
 # Get total size of dictionary recursively as sys.getsizeof(dict) might give incorrect results
@@ -35,10 +35,17 @@ def save_block(block_name, block_dict):
     pass
 
 
+def sort_and_save_block(dictionary, block_counter):
+    sorted_dictionary = dict(sorted(dictionary.items()))
+    save_block(f"block{block_counter}", sorted_dictionary)
+    print(block_counter, get_total_size(sorted_dictionary), sorted_dictionary)
+
+    return sorted_dictionary
+
+
 def spimi_invert(token_stream):
     block_counter = 0
     dictionary = {}
-    dictionary_checkpoint = {}
 
     for token in token_stream:
         dictionary_checkpoint = dictionary.copy()
@@ -46,27 +53,24 @@ def spimi_invert(token_stream):
         token_word = token[0]
         token_file_id = token[1]
 
+        # If token is not in dictionary, add its file ID with a term frequency of one
         if token_word not in dictionary:
             dictionary[token_word] = [[token_file_id, 1]]
+        # Else if it already exists an occurrence of the token in the same file, add one to its term frequency
         elif dictionary[token_word][-1][0] == token_file_id:
             dictionary[token_word][-1][1] += 1
-        elif dictionary[token_word][-1][0] != token_file_id:
+        # Else, appends its file ID with a term frequency of one
+        else:
             dictionary[token_word].append([token_file_id, 1])
 
-        if get_total_size(dictionary) > BLOCK_SIZE:
-            sorted_dictionary = dict(sorted(dictionary_checkpoint.items()))
-            save_block(f"block{block_counter}", sorted_dictionary)
-
-            print(block_counter, get_total_size(sorted_dictionary), sorted_dictionary)
+        if get_total_size(dictionary) > PAGE_SIZE:
+            sort_and_save_block(dictionary_checkpoint, block_counter)
 
             dictionary = {token_word: [[token_file_id, 1]]}
-            dictionary_checkpoint = {}
             block_counter += 1
 
     if dictionary:
-        sorted_dictionary = dict(sorted(dictionary.items()))
-        save_block(f"block{block_counter}", sorted_dictionary)
-        print(block_counter, get_total_size(sorted_dictionary), sorted_dictionary)
+        sort_and_save_block(dictionary, block_counter)
 
 
 if __name__ == "__main__":
