@@ -89,6 +89,11 @@ def merge_blocks(blocks_folder, output_file):
                             current_writer_line.append(int(elem[0]))
                             current_writer_line.append(elem[1])
 
+        text_to_write = ""
+        for elem in current_writer_line:
+            text_to_write += f"{elem},"
+        writer.write(text_to_write[:-1] + "\n")
+
     for reader in readers:
         reader.close()
 
@@ -184,8 +189,6 @@ if __name__ == "__main__":
     with open("./filenames_dict.json", "r", encoding='utf-8') as file:
         filenames_dict = json.load(file)
 
-    print("-----------------------------------------")
-
-    print(filenames_dict)
+    print(json.dumps(filenames_dict, indent=1))
 
     os.remove("filenames_dict.json")
