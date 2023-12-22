@@ -2,6 +2,7 @@ import sys
 import os
 import json
 import heapq
+import math
 from text_processing_pipeline import process_files_txt
 
 PAGE_SIZE = 40960
@@ -170,6 +171,29 @@ def spimi_invert(token_stream):
         sort_and_save_block(dictionary, block_counter)
 
 
+def calculate_tfidf(merged_index_path, filenames_path, output_path):
+    with open(filenames_path, "r") as filenames_json:
+        filenames_len = len(json.load(filenames_json))
+
+    with open(merged_index_path, "r") as merged_index_file, open(output_path, "w") as output_file:
+        for line in merged_index_file:
+            parts = line.strip().split(',')
+            word = parts[0]
+            doc_freq = len(parts) // 2
+
+            idf = math.log(filenames_len / doc_freq)
+            print(f"word: {word} | {filenames_len} / {doc_freq} = {idf}")
+
+            new_line = [word]
+            for i in range(1, len(parts), 2):
+                file_id = parts[i]
+                tf = int(parts[i + 1])
+                tfidf = tf * idf
+                new_line.extend([file_id, str(tfidf)])
+
+            output_file.write(','.join(new_line) + '\n')
+
+
 if __name__ == "__main__":
     for filename in os.listdir('./blocks'):
         if os.path.isfile(os.path.join('./blocks', filename)):
@@ -189,6 +213,8 @@ if __name__ == "__main__":
     with open("./filenames_dict.json", "r", encoding='utf-8') as file:
         filenames_dict = json.load(file)
 
-    print(json.dumps(filenames_dict, indent=1))
+    # print(json.dumps(filenames_dict, indent=1))
+
+    calculate_tfidf("./merged_index.txt", "./filenames_dict.json", "./merged_index_tfidf.txt")
 
     os.remove("filenames_dict.json")
