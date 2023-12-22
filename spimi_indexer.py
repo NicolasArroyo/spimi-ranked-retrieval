@@ -3,6 +3,7 @@ import os
 import json
 import heapq
 import math
+import nltk
 from text_processing_pipeline import process_files_txt
 
 PAGE_SIZE = 40960
@@ -182,7 +183,7 @@ def calculate_tfidf(merged_index_path, filenames_path, output_path):
             doc_freq = len(parts) // 2
 
             idf = math.log(filenames_len / doc_freq)
-            print(f"word: {word} | {filenames_len} / {doc_freq} = {idf}")
+            # print(f"word: {word} | {filenames_len} / {doc_freq} = {idf}")
 
             new_line = [word]
             for i in range(1, len(parts), 2):
@@ -192,6 +193,35 @@ def calculate_tfidf(merged_index_path, filenames_path, output_path):
                 new_line.extend([file_id, str(tfidf)])
 
             output_file.write(','.join(new_line) + '\n')
+
+
+def compute_vector_score(query, merged_index_tfidf_path):
+    porter_stemmer = nltk.PorterStemmer()
+
+    index = {}
+    with open(merged_index_tfidf_path, "r") as file:
+        for line in file:
+            parts = line.strip().split(',')
+            word = parts[0]
+            postings = {int(parts[i]): float(parts[i + 1]) for i in range(1, len(parts), 2)}
+            index[word] = postings
+
+    query_terms = query.lower().split()
+    query_terms = [porter_stemmer.stem(term) for term in query_terms]
+    query_weights = {}
+    for term in query_terms:
+        if term in index:
+            query_weights[term] = math.log(1 + query_terms.count(term))
+
+    doc_scores = {}
+    for term, weight in query_weights.items():
+        for doc_id, doc_weight in index.get(term, {}).items():
+            if doc_id not in doc_scores:
+                doc_scores[doc_id] = 0
+            doc_scores[doc_id] += weight * doc_weight
+
+    sorted_docs = sorted(doc_scores.items(), key=lambda x: x[1], reverse=True)
+    return sorted_docs
 
 
 if __name__ == "__main__":
@@ -213,8 +243,13 @@ if __name__ == "__main__":
     with open("./filenames_dict.json", "r", encoding='utf-8') as file:
         filenames_dict = json.load(file)
 
-    # print(json.dumps(filenames_dict, indent=1))
+    print(json.dumps(filenames_dict))
 
     calculate_tfidf("./merged_index.txt", "./filenames_dict.json", "./merged_index_tfidf.txt")
+
+    query = str(input("Enter your query: "))
+    results = compute_vector_score(query, "./merged_index_tfidf.txt")
+    for doc_id, score in results:
+        print(filenames_dict[f"doc{doc_id}"], score)
 
     os.remove("filenames_dict.json")
