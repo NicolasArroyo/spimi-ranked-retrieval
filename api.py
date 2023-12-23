@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from spimi_indexer import initialize_index, compute_vector_score, initialize_index_csv
 import json
 
-initialize_index_csv("./blocks", "./merged_index.txt", "./filenames_dict.json")
+initialize_index_csv("./blocks", "./merged_index.txt", "./filenames_dict.json", "./songs/spotify_songs_filtered_1k.csv")
 
 
 class Item(BaseModel):

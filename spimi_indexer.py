@@ -247,7 +247,7 @@ def initialize_index(blocks_dir):
         logging.error(f"Error while executing: {e}")
 
 
-def initialize_index_csv(blocks_dir, merge_index_path, filenames_dict_path):
+def initialize_index_csv(blocks_dir, merge_index_path, filenames_dict_path, csv_path):
     for file in ['merged_index.txt', 'filenames_dict.json']:
         file_path = os.path.join('./', file)
         if os.path.isfile(file_path):
@@ -259,7 +259,7 @@ def initialize_index_csv(blocks_dir, merge_index_path, filenames_dict_path):
             os.remove(file_path)
 
     try:
-        spimi_invert(process_files_csv("./spotify_songs_filtered_1k.csv", "./filenames_dict.json"), blocks_dir)
+        spimi_invert(process_files_csv(csv_path, "./filenames_dict.json"), blocks_dir)
         merge_blocks('./blocks', 'merged_index.txt')
         calculate_tfidf("./merged_index.txt", "./filenames_dict.json", "./merged_index_tfidf.txt")
 
@@ -268,4 +268,5 @@ def initialize_index_csv(blocks_dir, merge_index_path, filenames_dict_path):
 
 
 if __name__ == "__main__":
-    initialize_index_csv("./blocks", "./merged_index.txt", "./filenames_dict.json")
+    initialize_index_csv("./blocks", "./merged_index.txt", "./filenames_dict.json",
+                         "./songs/spotify_songs_filtered_1k.csv")
