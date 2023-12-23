@@ -13,10 +13,10 @@ porter_stemmer = nltk.PorterStemmer()
 
 def tokenize_line(line):
     # Design: Use TweetTokenizer so it doesn't separate contractions
-    return tweet_tokenizer.tokenize(line)
+    # return tweet_tokenizer.tokenize(line)
 
     # Otherwise, comment previous line and uncomment the next one
-    # return nltk.word_tokenize(line)
+    return nltk.word_tokenize(line)
 
 
 def normalize_tokens(tokens):
@@ -46,9 +46,7 @@ def stem_tokens(tokens):
         yield porter_stemmer.stem(token)
 
 
-def update_filenames_dict(filenames_dict_dir, filename):
-    filenames_dict_path = os.path.join(filenames_dict_dir, "filenames_dict.json")
-
+def update_filenames_dict(filenames_dict_path, filename):
     if os.path.exists(filenames_dict_path):
         with open(filenames_dict_path, "r", encoding="utf-8") as file:
             filenames_dict = json.load(file)
@@ -64,9 +62,9 @@ def update_filenames_dict(filenames_dict_dir, filename):
     return len(filenames_dict) - 1
 
 
-def process_files_txt(files_dir, filenames_dict_dir):
+def process_files_txt(files_dir, filenames_dict_path):
     for filename in os.listdir(files_dir):
-        file_id = update_filenames_dict(filenames_dict_dir, filename)
+        file_id = update_filenames_dict(filenames_dict_path, filename)
         filepath = os.path.join(files_dir, filename)
 
         try:

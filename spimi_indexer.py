@@ -127,8 +127,8 @@ def get_total_size(obj, seen=None):
     return size
 
 
-def save_block(block_name, block_dict):
-    with open(f"./blocks/{block_name}.txt", "w") as file:
+def save_block(block_name, block_dict, blocks_dir):
+    with open(f"{blocks_dir}/{block_name}.txt", "w") as file:
         for key in block_dict:
             file.write(f"{key}")
             for elem in block_dict[key]:
@@ -136,15 +136,15 @@ def save_block(block_name, block_dict):
             file.write("\n")
 
 
-def sort_and_save_block(dictionary, block_counter):
+def sort_and_save_block(dictionary, block_counter, blocks_dir):
     sorted_dictionary = dict(sorted(dictionary.items()))
-    save_block(f"block{block_counter}", sorted_dictionary)
+    save_block(f"block{block_counter}", sorted_dictionary, blocks_dir)
     # print(block_counter, get_total_size(sorted_dictionary), sorted_dictionary)
 
     return sorted_dictionary
 
 
-def spimi_invert(token_stream):
+def spimi_invert(token_stream, blocks_dir):
     block_counter = 0
     dictionary = {}
 
@@ -165,13 +165,13 @@ def spimi_invert(token_stream):
             dictionary[token_word].append([token_file_id, 1])
 
         if get_total_size(dictionary) > PAGE_SIZE:
-            sort_and_save_block(dictionary_checkpoint, block_counter)
+            sort_and_save_block(dictionary_checkpoint, block_counter, blocks_dir)
 
             dictionary = {token_word: [[token_file_id, 1]]}
             block_counter += 1
 
     if dictionary:
-        sort_and_save_block(dictionary, block_counter)
+        sort_and_save_block(dictionary, block_counter, blocks_dir)
 
 
 def calculate_tfidf(merged_index_path, filenames_path, output_path):
@@ -227,20 +227,19 @@ def compute_vector_score(query, merged_index_tfidf_path, k):
     return sorted_docs
 
 
-def initialize_index():
+def initialize_index(blocks_dir):
     for file in ['merged_index.txt', 'filenames_dict.json']:
         file_path = os.path.join('./', file)
         if os.path.isfile(file_path):
             os.remove(file_path)
 
-    blocks_dir = './blocks'
     for filename in os.listdir(blocks_dir):
         file_path = os.path.join(blocks_dir, filename)
         if os.path.isfile(file_path):
             os.remove(file_path)
 
     try:
-        spimi_invert(process_files_txt("./books", "./"))
+        spimi_invert(process_files_txt("./books", "./"), blocks_dir)
         merge_blocks('./blocks', 'merged_index.txt')
         calculate_tfidf("./merged_index.txt", "./filenames_dict.json", "./merged_index_tfidf.txt")
 
@@ -248,20 +247,19 @@ def initialize_index():
         logging.error(f"Error while executing: {e}")
 
 
-def initialize_index_csv():
+def initialize_index_csv(blocks_dir, merge_index_path, filenames_dict_path):
     for file in ['merged_index.txt', 'filenames_dict.json']:
         file_path = os.path.join('./', file)
         if os.path.isfile(file_path):
             os.remove(file_path)
 
-    blocks_dir = './blocks'
     for filename in os.listdir(blocks_dir):
         file_path = os.path.join(blocks_dir, filename)
         if os.path.isfile(file_path):
             os.remove(file_path)
 
     try:
-        spimi_invert(process_files_csv("./spotify_songs_filtered_1k.csv", "./"))
+        spimi_invert(process_files_csv("./spotify_songs_filtered_1k.csv", "./filenames_dict.json"), blocks_dir)
         merge_blocks('./blocks', 'merged_index.txt')
         calculate_tfidf("./merged_index.txt", "./filenames_dict.json", "./merged_index_tfidf.txt")
 
@@ -270,4 +268,4 @@ def initialize_index_csv():
 
 
 if __name__ == "__main__":
-    initialize_index_csv()
+    initialize_index_csv("./blocks", "./merged_index.txt", "./filenames_dict.json")
