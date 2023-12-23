@@ -248,7 +248,7 @@ def initialize_index(blocks_dir):
 
 
 def initialize_index_csv(blocks_dir, merge_index_path, filenames_dict_path, csv_path):
-    for file in ['merged_index.txt', 'filenames_dict.json']:
+    for file in ['merged_index.txt', 'filenames_dict.json', "merged_index_tfidf.txt"]:
         file_path = os.path.join('./', file)
         if os.path.isfile(file_path):
             os.remove(file_path)
