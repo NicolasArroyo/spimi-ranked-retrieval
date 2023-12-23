@@ -6,6 +6,7 @@ import math
 import nltk
 import logging
 from text_processing_pipeline import process_files_txt
+from csv_processing_pipeline import process_files_csv
 
 PAGE_SIZE = 4096
 
@@ -247,5 +248,26 @@ def initialize_index():
         logging.error(f"Error while executing: {e}")
 
 
+def initialize_index_csv():
+    for file in ['merged_index.txt', 'filenames_dict.json']:
+        file_path = os.path.join('./', file)
+        if os.path.isfile(file_path):
+            os.remove(file_path)
+
+    blocks_dir = './blocks'
+    for filename in os.listdir(blocks_dir):
+        file_path = os.path.join(blocks_dir, filename)
+        if os.path.isfile(file_path):
+            os.remove(file_path)
+
+    try:
+        spimi_invert(process_files_csv("./spotify_songs_filtered_1k.csv", "./"))
+        merge_blocks('./blocks', 'merged_index.txt')
+        calculate_tfidf("./merged_index.txt", "./filenames_dict.json", "./merged_index_tfidf.txt")
+
+    except Exception as e:
+        logging.error(f"Error while executing: {e}")
+
+
 if __name__ == "__main__":
-    initialize_index()
+    initialize_index_csv()

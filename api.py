@@ -1,9 +1,9 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
-from spimi_indexer import initialize_index, compute_vector_score
+from spimi_indexer import initialize_index, compute_vector_score, initialize_index_csv
 import json
 
-initialize_index()
+initialize_index_csv()
 
 
 class Item(BaseModel):
