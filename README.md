@@ -67,6 +67,7 @@ To correctly use this project and see how it works you should follow these steps
 4. **Index Generation (Optional)**:
     - Modify the token stream source in `generate_index()` within `index_generator.py`.
     - Run the script:
+      
       ```bash
       python3 index_generator.py
       ```
