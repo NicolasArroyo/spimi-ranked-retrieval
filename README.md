@@ -34,7 +34,7 @@ Features:
 ## Theory source
 
 In order to implement the SPIMI process, the theory given in
-in [these docs](https://nlp.stanford.edu/IR-book/html/htmledition/contents-1.html)
+[these docs](https://nlp.stanford.edu/IR-book/html/htmledition/contents-1.html)
 by [The Stanford Natural Language Processing Group](https://nlp.stanford.edu/) was used.
 
 ## Prerequisites
