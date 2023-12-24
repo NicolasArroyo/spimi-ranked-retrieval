@@ -91,30 +91,30 @@ To correctly use this project and see how it works you should follow these steps
     "k": 3
   }
   ```
-
+  
   ```json
   {
-     "doc0": {
-       "score": 7.889683586827221,
-       "id": "3Dt75NjLThmoBTp5wQC7g7",
-       "name": "Same Old Song",
-       "artist": "The Weeknd",
-       "album_name": "Trilogy"
-     },
-     "doc1": {
-       "score": 3.9448417934136106,
-       "id": "00NAQYOP4AmWR549nnYJZu",
-       "name": "Secrets",
-       "artist": "The Weeknd",
-       "album_name": "Starboy"
-     },
-     "doc2": {
-       "score": 3.9448417934136106,
-       "id": "0dcf0L6F1LUA1nE2zWH4J2",
-       "name": "The Party & The After Party",
-       "artist": "The Weeknd",
-       "album_name": "Trilogy"
-     }
+    "doc0": {
+      "score": 7.889683586827221,
+      "id": "3Dt75NjLThmoBTp5wQC7g7",
+      "name": "Same Old Song",
+      "artist": "The Weeknd",
+      "album_name": "Trilogy"
+    },
+    "doc1": {
+      "score": 3.9448417934136106,
+      "id": "00NAQYOP4AmWR549nnYJZu",
+      "name": "Secrets",
+      "artist": "The Weeknd",
+      "album_name": "Starboy"
+    },
+    "doc2": {
+      "score": 3.9448417934136106,
+      "id": "0dcf0L6F1LUA1nE2zWH4J2",
+      "name": "The Party & The After Party",
+      "artist": "The Weeknd",
+      "album_name": "Trilogy"
+    }
   }
   ```
 
