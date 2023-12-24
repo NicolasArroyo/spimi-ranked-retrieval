@@ -125,7 +125,7 @@ To correctly use this project and see how it works you should follow these steps
 
   {
     "query": "Pour some sugar on me",
-    "k": 4
+    "k": 2
   }
   ```
 
