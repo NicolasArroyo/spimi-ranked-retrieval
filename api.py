@@ -1,9 +1,11 @@
-from fastapi import FastAPI
-from pydantic import BaseModel
-from spimi_indexer import initialize_index, compute_vector_score, initialize_index_csv
 import json
 
-initialize_index_csv("./blocks", "./merged_index.txt", "./filenames_dict.json", "./songs/spotify_songs_filtered_1k.csv")
+from fastapi import FastAPI
+from pydantic import BaseModel
+from index_generator import generate_index
+from index_queries import compute_vector_score
+
+# generate_index()
 
 
 class Item(BaseModel):
@@ -11,7 +13,7 @@ class Item(BaseModel):
     k: int
 
 
-with open("./filenames_dict.json", "r", encoding='utf-8') as file:
+with open("./index_output/filenames.json", "r", encoding='utf-8') as file:
     filenames_dict = json.load(file)
 
 app = FastAPI()
@@ -19,7 +21,7 @@ app = FastAPI()
 
 @app.post("/api/index/")
 def post_api(item: Item):
-    results = compute_vector_score(item.query, "./merged_index_tfidf.txt", item.k)
+    results = compute_vector_score(item.query, "./index_output/merged_weighted_index.txt", item.k)
 
     response = {}
     for doc_id, score in results:
