@@ -139,7 +139,7 @@ def generate_index():
     os.makedirs(output_dir, exist_ok=True)
     os.makedirs(blocks_dir, exist_ok=True)
 
-    token_stream = process_csv_file("./songs/spotify_songs_filtered_16k.csv", output_dir)
+    token_stream = process_csv_file("./songs/songs_filter_16k.csv", output_dir)
     spimi_invert(token_stream, blocks_dir)
 
     create_merged_index(blocks_dir, f"{output_dir}/merged_index.txt")
@@ -149,11 +149,18 @@ def generate_index():
 
 
 if __name__ == "__main__":
-    output_dir = "./index_output"
-    blocks_dir = "./index_output/blocks"
+    # clear_folder("./test-blocks")
 
-    create_merged_weighted_index(f"{output_dir}/merged_index.txt",
-                                 f"{output_dir}/filenames.json",
-                                 f"{output_dir}/merged_weighted_index.txt")
+    # spimi_invert(process_csv_file("./songs_filter_100.csv",
+    #                               "./"),
+    #              "./test-blocks")
+
+    # output_dir = "./index_output"
+    # blocks_dir = "./index_output/blocks"
+    #
+    # create_merged_weighted_index(f"{output_dir}/merged_index.txt",
+    #                              f"{output_dir}/filenames.json",
+    #                              f"{output_dir}/merged_weighted_index.txt")
+    #
     # create_merged_index("./index_output/blocks", "./index_output/merged_index.txt")
-    # generate_index()
+    generate_index()

@@ -71,8 +71,15 @@ def process_csv_file(csv_path, filenames_json_output_dir):
                 print(f"DEBUG: Yielding {i}th row")
 
             if row:
-                file_id = row[0]
-                files_ids.append(file_id)
+                new_file = {
+                    "id": row[0],
+                    "name": row[1],
+                    "artist": row[2],
+                    "album_name": row[4]
+                }
+
+                # file_id = row[0]
+                files_ids.append(new_file)
 
                 tokens = tokenize_line(','.join(row))
                 tokens = normalize_tokens(tokens)
